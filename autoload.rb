@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+require 'i18n'
+require 'yaml'
+require_relative 'config/i18n'
+require_relative 'lib/codebreaker_vk/uploader/uploader'
+require_relative 'lib/codebreaker_vk/validate/validate'
+require_relative 'lib/codebreaker_vk/validating_data'
+require_relative 'lib/codebreaker_vk/check_errors'
+require_relative 'lib/codebreaker_vk/difficulty'
+require_relative 'lib/codebreaker_vk/game'
+require_relative 'lib/codebreaker_vk/console'
+require_relative 'lib/codebreaker_vk/game_user'
+require_relative 'lib/codebreaker_vk/game_messages'
+require_relative 'lib/codebreaker_vk/game_process'
+require_relative 'lib/codebreaker_vk/version'
