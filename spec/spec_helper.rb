@@ -1,6 +1,9 @@
 # frozen_string_literal: true
-
 require 'simplecov'
+require 'pry'
+require 'yaml'
+require_relative '../autoload'
+
 SimpleCov.start do
   minimum_coverage 95
 end
@@ -18,4 +21,10 @@ RSpec.configure do |config|
   end
 
   config.disable_monkey_patching!
+
+  config.shared_context_metadata_behavior = :apply_to_host_groups
+
+  config.after(:suite) do
+    puts "I just ran a test."
+  end
 end

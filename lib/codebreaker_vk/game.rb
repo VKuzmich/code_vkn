@@ -2,81 +2,74 @@
 
 module CodebreakerVk
   class Game
-    attr_reader :hints, :attempts, :difficulty, :breaker_numbers, :showed_hints, :player_name
+    include Output
+    SECRET_CODE_LENGTH = 4
+    RANGE_START = 1
+    RANGE_END = 6
+    NOT_YET = '-'
+    GOT_IT = '+'
+    DIFFICULTY_LEVEL = {
+        easy: { attempts: 15, hints: 3 },
+        medium: { attempts: 10, hints: 2 },
+        hell: { attempts: 5, hints: 1 }
+    }.freeze
 
-    INCLUDE_IN_GAME_NUMBERS = (1..6).freeze
-    CODE_SIZE = 4
+    attr_accessor :attempts_total, :attempts, :difficulty, :hints_total, :hints, :name, :secret
 
-    GUESS_PLACE = '+'
-    GUESS_PRESENCE = '-'
-
-    def initialize(difficulty, user)
-      @breaker_numbers = generate_random_code
-      @breaker_numbers_copy = @breaker_numbers.clone.shuffle
-      @hints = difficulty.level[:hints]
-      @attempts = difficulty.level[:attempts]
-      @difficulty = difficulty.level
-      @player_name = user.name
-      @showed_hints = []
+    def initialize(name:, difficulty:)
+      @name = name
+      @difficulty = difficulty
+      @attempts = DIFFICULTY_LEVEL[difficulty][:attempts]
+      @hints = DIFFICULTY_LEVEL[difficulty][:hints]
+      @secret = make_number
+      @unused_hints = @secret.chars
     end
 
-    def start_round(user_input)
+    def make_number(numbers = RANGE_END)
+      (1..SECRET_CODE_LENGTH).map { rand(RANGE_START..numbers) }.join
+    end
+
+    def check(number)
       @attempts -= 1
-      @game_numbers = { code: @breaker_numbers.clone, input: user_input }
-      collect_place_guess + collect_presence_guess
+      @last_result = check_numbers(@secret.chars, number.chars)
     end
 
-    def hint
-      return if @hints.zero?
+    def win?
+      @last_result == GOT_IT * SECRET_CODE_LENGTH
+    end
+
+    def use_hint
+      return I18n.t(:no_hints) unless @hints.positive?
 
       @hints -= 1
-      @showed_hints << @breaker_numbers_copy.pop
-      @showed_hints.last
-    end
-
-    def win?(result)
-      @breaker_numbers == result
-    end
-
-    def lose?(result)
-      @attempts == 1 && @breaker_numbers != result
-    end
-
-    def to_h
-      {
-        player_name: @player_name,
-        level: @difficulty[:level],
-        all_hints: @difficulty[:hints],
-        all_attempts: @difficulty[:attempts],
-        left_hints: @hints,
-        left_attempts: @attempts,
-        date: Time.now
-      }
+      hint(@unused_hints)
     end
 
     private
 
-    def collect_place_guess
-      @game_numbers[:input].map.with_index do |user_num, index|
-        next if @game_numbers[:code][index] != user_num
+    def check_numbers(secret, numbers)
+      exact_matches, non_exact_matches = secret.zip(numbers).partition do |secret_number, input_number|
+        secret_number == input_number
+      end
 
-        @game_numbers[:code][index] = nil
-        @game_numbers[:input][index] = nil
-        GUESS_PLACE
-      end.compact
+      result = Array.new(exact_matches.count, GOT_IT)
+
+      find_non_exact_matches(result, non_exact_matches) if non_exact_matches.any?
+
+      result.join
     end
 
-    def collect_presence_guess
-      @game_numbers[:input].compact.map do |user_num|
-        next unless @game_numbers[:code].include?(user_num)
+    def find_non_exact_matches(result, non_exact_matches)
+      secret, numbers = non_exact_matches.transpose
+      numbers.each do |number_element|
+        next unless secret.include? number_element
 
-        @game_numbers[:code].delete_at(@game_numbers[:code].index(user_num))
-        GUESS_PRESENCE
-      end.compact
+        result.push(NOT_YET) && secret.delete_at(secret.index(number_element))
+      end
     end
 
-    def generate_random_code
-      Array.new(CODE_SIZE) { rand(INCLUDE_IN_GAME_NUMBERS) }
+    def hint(secret)
+      secret.shuffle.pop
     end
   end
 end
