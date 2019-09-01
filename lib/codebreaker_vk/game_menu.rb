@@ -60,7 +60,7 @@ module CodebreakerVk
       end
 
       def stats
-        return puts I18n.t(:no_stats) unless File.exist?('./seed.yaml')
+        return puts I18n.t(:no_stats) unless File.exist?('spec/fixtures/seed.yaml')
 
         table = load.sort_by { |row| [row.hints_total, row.attempts_used] }
         table.each { |row| row.difficulty = Game::DIFFICULTY_LEVEL.key([row.attempts_total, row.hints_total]) }
