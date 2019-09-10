@@ -9,9 +9,9 @@ module CodebreakerVk
     NOT_YET = '-'
     GOT_IT = '+'
     DIFFICULTY_LEVEL = {
-        easy: { attempts: 15, hints: 3 },
-        medium: { attempts: 10, hints: 2 },
-        hell: { attempts: 5, hints: 1 }
+      easy: { attempts: 15, hints: 3 },
+      medium: { attempts: 10, hints: 2 },
+      hell: { attempts: 5, hints: 1 }
     }.freeze
 
     attr_accessor :attempts_total, :attempts, :difficulty, :hints_total, :hints, :name, :secret

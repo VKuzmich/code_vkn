@@ -6,3 +6,10 @@
   attempts_used: 11
   hints_total: 3
   hints_used: 3
+- !ruby/object:CodebreakerVk::TableData
+  name: rere
+  difficulty: :easy
+  attempts_total: 15
+  attempts_used: 5
+  hints_total: 3
+  hints_used: 3
